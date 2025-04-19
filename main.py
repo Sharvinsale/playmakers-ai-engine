@@ -1,53 +1,33 @@
 from dotenv import load_dotenv
 import os
+
+# Your custom modules
 from parser.tax1040_parser import extract_data
 from gpt_engine.generate_insights import get_insights
+from utils.generate_pdf import generate_pdf
 
+# ✅ Load environment variables
 load_dotenv()
+openai_key = os.getenv("OPENAI_API_KEY")
 
-api_key = os.getenv("OPENAI_API_KEY")
-
-if not api_key:
-    print("❌ OPENAI_API_KEY not loaded. Check your .env file format.")
-    print("Current Working Directory:", os.getcwd())
+if not openai_key:
+    print("❌ OpenAI API key not found in .env!")
     exit()
 
-print("✅ OpenAI key loaded:", api_key[:10], "...")
+print(f"✅ OpenAI key loaded: {openai_key[:10]}...")
 
-
-
-
+# 📄 Path to your test PDF
 file_path = "sample_1040.pdf"
 
-# Extract values
-data = extract_data(file_path)
-print("📄 Extracted Data:", data)
+# ✅ Step 1: Extract financial data from PDF
+extracted_data = extract_data(file_path)
+print("📄 Extracted Data:", extracted_data)
 
-# Send to GPT
-insights = get_insights(data)
+# ✅ Step 2: Send extracted data to GPT for insights
+insights = get_insights(extracted_data)
 print("\n💡 AI Insights:\n", insights)
 
-from dotenv import load_dotenv
-import os
+# ✅ Step 3: Generate a PDF report from extracted + AI data
+generate_pdf(extracted_data, insights)
 
-from parser.tax1040_parser import extract_data
-from gpt_engine.generate_insights import get_insights
-
-load_dotenv()
-
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    print("❌ OPENAI_API_KEY not loaded.")
-    exit()
-
-print("✅ OpenAI key loaded:", api_key[:10], "...")
-
-# === Step 1: Load PDF and extract data ===
-file_path = "sample_1040.pdf"
-data = extract_data(file_path)
-print("\n📄 Extracted Data:\n", data)
-
-# === Step 2: Generate insights from GPT ===
-insights = get_insights(data)
-print("\n💡 AI Insights:\n", insights)
-
+print("🎯 Done! Your client-ready report is ready as 'playmakers_report.pdf'")
