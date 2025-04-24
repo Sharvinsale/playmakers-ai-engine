@@ -1,33 +1,28 @@
-from dotenv import load_dotenv
-import os
-
-# Your custom modules
 from parser.tax1040_parser import extract_data
 from gpt_engine.generate_insights import get_insights
-from utils.generate_pdf import generate_pdf
+import os
 
-# ✅ Load environment variables
-load_dotenv()
-openai_key = os.getenv("OPENAI_API_KEY")
+# === Step 1: Load and extract data from PDF ===
+file_path = "sample_filled_1040.pdf"
 
-if not openai_key:
-    print("❌ OpenAI API key not found in .env!")
-    exit()
+print("📄 Reading PDF and extracting data...")
+data = extract_data(file_path)
 
-print(f"✅ OpenAI key loaded: {openai_key[:10]}...")
+print("\n🧾 Extracted Data:")
+for key, value in data.items():
+    print(f"{key}: {value}")
 
-# 📄 Path to your test PDF
-file_path = "sample_1040.pdf"
+# === Step 2: Generate AI-powered financial summary ===
+print("\n💡 Generating AI Insights...")
+insights = get_insights(data)
 
-# ✅ Step 1: Extract financial data from PDF
-extracted_data = extract_data(file_path)
-print("📄 Extracted Data:", extracted_data)
+print("\n📈 AI Summary:")
+print(insights)
 
-# ✅ Step 2: Send extracted data to GPT for insights
-insights = get_insights(extracted_data)
-print("\n💡 AI Insights:\n", insights)
+# === Step 3: Save to file ===
+output_folder = "reports"
+os.makedirs(output_folder, exist_ok=True)
+with open(os.path.join(output_folder, "ai_summary.txt"), "w") as f:
+    f.write(insights)
 
-# ✅ Step 3: Generate a PDF report from extracted + AI data
-generate_pdf(extracted_data, insights)
-
-print("🎯 Done! Your client-ready report is ready as 'playmakers_report.pdf'")
+print(f"\n✅ Summary saved to {os.path.join(output_folder, 'ai_summary.txt')}")

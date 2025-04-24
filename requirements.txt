@@ -1,5 +1,3 @@
+PyPDF2
 openai
-pdfplumber
-PyMuPDF
-pandas
 python-dotenv
